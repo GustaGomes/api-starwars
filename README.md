@@ -2,6 +2,7 @@
 
 - Navegar até a pasta do projeto
 - Instalar todas as dependencias usando "yarn" ou "npm install"
+- Rodar comando "yarn dev" ou "npm run dev"
 
 ### Exemplos de planetas que você pode pesquisar :
 
