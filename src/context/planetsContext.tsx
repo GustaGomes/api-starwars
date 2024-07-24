@@ -4,20 +4,19 @@ import React, {
   useState,
   ReactNode,
   useEffect,
-  useMemo,
 } from "react";
 import { Planet } from "../services/planets/model";
 import { getPlanets } from "../services/planets/getPlanets";
-import { parsePlanet } from "../utils/parsePlanet";
+import { parsePlanets } from "../utils/parsePlanets";
 import { getFilm } from "../services/films/get-film";
 import { getPeople } from "../services/people/get-people";
 
 interface AppContextType {
+  planets: Planet[];
+  isLoading: boolean;
   selectedPlanet: Planet | undefined;
-  isLoadingData: boolean;
-  editPlanet: (name: string) => void;
-  getPlanetByName: (name: string) => Planet | undefined;
-  selectPlanet: (name: string) => void;
+  selectPlanet: (planetId: string) => void;
+  editPlanet: (planetId: string, data: Partial<Planet>) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -26,98 +25,79 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [planets, setPlanets] = useState<Planet[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(false);
-  const [selectedPlanet, setSelectedPlanet] = useState<Planet | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedPlanet, setSelectedPlanet] = useState<Planet>();
 
-  const getPlanetByName = (name: string) => {
-    const foundPlanet = planets.find(
-      (planet) => planet.name.toLowerCase() === name.toLowerCase()
-    );
-
-    return foundPlanet;
-  };
-
-  const editPlanet = (name: string) => {
-    if (!selectedPlanet) return;
-
+  const editPlanet = (planetId: string, data: Partial<Planet>) => {
     const newPlanets = planets.map((planet) => {
-      if (planet.name === selectedPlanet.name) {
-        return { ...planet, name };
+      if (planet.id === planetId) {
+        return { ...planet, ...data };
       }
+
       return planet;
     });
 
     setPlanets(newPlanets);
-    setSelectedPlanet({ ...selectedPlanet, name });
-    alert("Planeta atualizado");
   };
 
   // Buscar os dados dos planetas usando o getPlanets
   const fetchPlanets = async () => {
+    setIsLoading(true);
+
     try {
       const data = await getPlanets();
 
       if (!data) return;
 
-      const newPlanets = data.map((planet) => parsePlanet(planet));
+      const newPlanets = parsePlanets(data);
 
       setPlanets(newPlanets);
     } catch (err) {
       console.log("erro", err);
       window.alert("Erro ao carregar planetas");
     }
+
+    setIsLoading(false);
   };
 
-  // Selecionar um planeta pelo nome e carregar suas informações
-  const selectPlanet = async (name: string) => {
-    setIsLoadingData(true);
+  // Selecionar um planeta pelo id e carregar suas informações
+  const selectPlanet = async (planetId: string) => {
+    const allplanets = [...planets];
+    const foundIndex = allplanets.findIndex((planet) => planet.id === planetId);
+    const foundPlanet = allplanets[foundIndex];
 
-    const currentPlanets = [...planets];
-    const index = currentPlanets.findIndex(
-      (p) => p.name.toLowerCase() === name.toLowerCase()
-    );
-    const planet = currentPlanets[index];
-    // usar getFilm e getPeople para carregar as informações dos planetas para evitar mais chamadas na api
-    try {
-      if (!planet.fullFilms) {
-        const films = planet.films.map(async (url) => {
-          const filmId = url.split("/").slice(-2)[0];
-          const data = await getFilm(filmId);
-          return data;
-        });
-
-        planet.fullFilms = await Promise.all(films);
-      }
-
-      if (!planet.fullResidents) {
-        const residents = planet.residents.map(async (url) => {
-          const personId = url.split("/").slice(-2)[0];
-          const data = await getPeople(personId);
-          return data;
-        });
-
-        planet.fullResidents = await Promise.all(residents);
-      }
-    } catch (error) {
-      window.alert("Erro ao carregar informações do planeta");
+    if (!foundPlanet) {
+      return;
     }
 
-    currentPlanets[index] = planet;
-    setPlanets(currentPlanets);
-    setSelectedPlanet(planet);
-    setIsLoadingData(false);
+    setIsLoading(true);
+
+    if (!foundPlanet.fullFilms) {
+      const films = foundPlanet.films.map(async (url) => {
+        const filmId = url.split("/").slice(-2)[0];
+        const data = await getFilm(filmId);
+        return data;
+      });
+
+      foundPlanet.fullFilms = await Promise.all(films);
+    }
+
+    if (!foundPlanet.fullResidents) {
+      const residents = foundPlanet.residents.map(async (url) => {
+        const personId = url.split("/").slice(-2)[0];
+        const data = await getPeople(personId);
+        return data;
+      });
+
+      foundPlanet.fullResidents = await Promise.all(residents);
+    }
+
+    allplanets[foundIndex] = foundPlanet;
+
+    setIsLoading(false);
+    setPlanets(allplanets);
+    setSelectedPlanet(foundPlanet);
   };
-
-  // Memorizar o planeta selecionado
-  const memoizedPlanet = useMemo(() => {
-    if (!selectedPlanet) return;
-
-    return {
-      ...selectedPlanet,
-      fullFilms: selectedPlanet.fullFilms,
-      fullResidents: selectedPlanet.fullResidents,
-    };
-  }, [selectedPlanet]);
 
   useEffect(() => {
     fetchPlanets();
@@ -126,11 +106,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   return (
     <AppContext.Provider
       value={{
-        selectedPlanet: memoizedPlanet,
-        isLoadingData,
-        getPlanetByName,
-        editPlanet,
+        planets,
+        selectedPlanet,
+        isLoading,
         selectPlanet,
+        editPlanet,
       }}
     >
       {children}

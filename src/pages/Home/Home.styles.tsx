@@ -149,3 +149,13 @@ export const FilterSelectContainer = styled.div`
     color: #000;
   }
 `;
+
+export const ModalStyle = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: #000;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 1rem;
+`;

@@ -27,7 +27,7 @@ type FormData = {
 
 const PlanetDetail: React.FC = () => {
   const navigate = useNavigate();
-  const { selectedPlanet, editPlanet, isLoadingData } = useAppContext();
+  const { editPlanet, selectedPlanet, isLoading } = useAppContext();
 
   const {
     register,
@@ -37,20 +37,25 @@ const PlanetDetail: React.FC = () => {
   } = useForm<FormData>();
 
   const onSubmit = (data: FormData) => {
-    editPlanet(data.name);
+    if (!selectedPlanet) return;
+
+    editPlanet(selectedPlanet.id, { name: data.name });
+
+    window.alert("Nome do planeta alterado com sucesso!");
   };
 
   useEffect(() => {
-    if (!selectedPlanet) return;
-    setValue("name", selectedPlanet.name);
+    if (selectedPlanet) {
+      setValue("name", selectedPlanet.name);
+    }
   }, [selectedPlanet, setValue]);
 
-  if (isLoadingData) {
-    return <div>Carregando...</div>;
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
   if (!selectedPlanet) {
-    return <div>Planeta não encontrado</div>;
+    return <div>No planet selected</div>;
   }
 
   return (
@@ -98,22 +103,22 @@ const PlanetDetail: React.FC = () => {
           </ContentImage>
           <ContentPeople>
             <HeadDetail>
-              <Person /> Residents:
+              <Person /> Residents({selectedPlanet.fullResidents?.length || 0}):
             </HeadDetail>
             <Divider />
             <div>
-              {selectedPlanet?.fullResidents?.map((resident) => (
+              {selectedPlanet.fullResidents?.map((resident) => (
                 <p key={resident.name}>{resident.name},</p>
               ))}
             </div>
           </ContentPeople>
           <ContentPeople>
             <HeadDetail>
-              <MovieFilter /> Films({selectedPlanet?.fullFilms?.length}):
+              <MovieFilter /> Films({selectedPlanet.fullFilms?.length || 0}):
             </HeadDetail>
             <Divider />
             <div>
-              {selectedPlanet?.fullFilms?.map((film) => (
+              {selectedPlanet.fullFilms?.map((film) => (
                 <p key={film.title}>{film.title}, </p>
               ))}
             </div>

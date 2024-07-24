@@ -1,14 +1,18 @@
 import { Film } from "../films/model";
 import { Person } from "../people/model";
 
-export type Planet = {
+export interface PlanetApi {
   name: string;
   climate: string;
   terrain: string;
-  population: number | string;
+  population: string;
   residents: string[];
   films: string[];
-  imageUrl?: string;
+}
+
+export interface Planet extends PlanetApi {
+  id: string;
+  imageUrl: string;
   fullResidents?: Person[];
   fullFilms?: Film[];
-};
+}

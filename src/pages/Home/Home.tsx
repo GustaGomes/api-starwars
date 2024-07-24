@@ -1,41 +1,90 @@
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { Search, Tune } from "@mui/icons-material";
+
+import { useAppContext } from "../../context/planetsContext";
+import marsCollage from "../../assets/mars-collage.png";
+import spaceship from "../../assets/spaceship.png";
+import { Planet } from "../../services/planets/model";
+import { SearchBy } from "./types";
 import {
   FormContainer,
   Wrapper,
   WrapperContent,
   Button,
   DivNav,
-  ResponsiveContainer,
   FilterSelectContainer,
   ResponsiveForm,
+  ModalStyle,
 } from "./Home.styles";
-import { Search, Tune } from "@mui/icons-material";
-import { useForm } from "react-hook-form";
-import { useAppContext } from "../../context/planetsContext";
-import { useNavigate } from "react-router-dom";
-import marsCollage from "../../assets/mars-collage.png";
-import spaceship from "../../assets/spaceship.png";
+import {
+  Box,
+  FormControlLabel,
+  Modal,
+  Radio,
+  RadioGroup,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
 interface SearchForm {
-  name: string;
-  population: string;
+  value: string;
+  searchBy: SearchBy;
 }
 
+const defaultValues: SearchForm = {
+  value: "",
+  searchBy: "name",
+};
+
 function Home() {
-  const { register, handleSubmit } = useForm<SearchForm>();
-  const { getPlanetByName, selectPlanet } = useAppContext();
+  const [filteredPlanets, setFilteredPlanets] = useState<Planet[]>([]);
+
+  const { planets, isLoading, selectPlanet } = useAppContext();
 
   const navigate = useNavigate();
 
-  const onSubmit = (data: SearchForm) => {
-    const foundPlanet = getPlanetByName(data.name);
+  const { register, handleSubmit } = useForm<SearchForm>({
+    defaultValues,
+  });
 
-    if (!foundPlanet) {
-      window.alert("Planeta não encontrado.");
-    } else {
-      selectPlanet(data.name);
-      navigate("/detail");
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const onSubmit = (data: SearchForm) => {
+    if (!data.value) {
+      setFilteredPlanets(planets);
+      return;
+    }
+
+    if (data.searchBy === "name") {
+      const newFilteredPlanets = planets.filter((planet) =>
+        planet.name.toLowerCase().includes(data.value.toLowerCase())
+      );
+
+      setFilteredPlanets(newFilteredPlanets);
+      return;
+    }
+
+    if (data.searchBy === "population") {
+      const newFilteredPlanets = planets.filter(
+        (planet) => planet.population === data.value
+      );
+
+      setFilteredPlanets(newFilteredPlanets);
     }
   };
+
+  const handlePlanetSelect = (planetId: string) => {
+    selectPlanet(planetId);
+    navigate("/detail");
+  };
+
+  useEffect(() => {
+    setFilteredPlanets(planets);
+  }, [planets]);
 
   return (
     <>
@@ -54,12 +103,14 @@ function Home() {
             </p>
             <ResponsiveForm>
               <form onSubmit={handleSubmit(onSubmit)}>
-                <input
-                  {...register("name")}
-                  type="text"
-                  placeholder="Enter the name in the planet"
-                />
-                <Button type="submit">
+                <Tooltip title="Clicando no campo vazio, ira mostrar todos os planetas">
+                  <input
+                    {...register("value")}
+                    type="text"
+                    placeholder="Enter the name in the planet"
+                  />
+                </Tooltip>
+                <Button onClick={handleOpen} type="submit">
                   <Search /> Search
                 </Button>
 
@@ -68,36 +119,77 @@ function Home() {
                 <FilterSelectContainer>
                   <Tune />
                   Filter
-                  <select disabled>
-                    <option value="">Name</option>
-                    <option value="tatooine">tatooine</option>
-                    <option value="naboo">naboo</option>
-                    <option value="mustafar">mustafar</option>
-                    <option value="kashyyyk">kashyyyk</option>
-                    <option value="hoth">hoth</option>
-                    <option value="endor">endor</option>
-                    <option value="dagobah">dagobah</option>
-                    <option value="coruscant">coruscant</option>
-                    <option value="bespin">bespin</option>
-                    <option value="alderaan">alderaan</option>
-                  </select>
-                  <select disabled>
-                    <option value="">Population</option>
-                    <option value="1000000000000">1000000000000</option>
-                    <option value="6000000">6000000</option>
-                    <option value="unknown">unknown</option>
-                    <option value="1000000000000">1000000000000</option>
-                    <option value="6000000">6000000</option>
-                    <option value="2000000000">2000000000</option>
-                    <option value="unknown">unknown</option>
-                    <option value="1000000000000">1000000000000</option>
-                    <option value="6000000">6000000</option>
-                    <option value="2000000000">2000000000</option>
-                  </select>
+                  <RadioGroup row name="row-radio-buttons-group">
+                    <FormControlLabel
+                      value="name"
+                      {...register("searchBy")}
+                      control={<Radio />}
+                      label="name"
+                    />
+                    <FormControlLabel
+                      value="population"
+                      {...register("searchBy")}
+                      control={<Radio />}
+                      label="Population"
+                    />
+                  </RadioGroup>
                 </FilterSelectContainer>
                 {/* </ResponsiveContainer> */}
               </form>
             </ResponsiveForm>
+            {isLoading && <p>Loading...</p>}
+
+            {!isLoading && filteredPlanets.length === 0 && (
+              <p>No planet found</p>
+            )}
+
+            {/*  Antes de consultar os planetas, o usuario pode não saber o nome do planeta ou durante a pesquisa ele pode receber
+             mais de uma opção com o valor pesquisado, por isso o modal */}
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <ModalStyle>
+                <Box>
+                  <Typography
+                    id="modal-modal-title"
+                    variant="h6"
+                    component="h2"
+                  >
+                    Selecionar planeta desejado
+                  </Typography>
+                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    {!isLoading && filteredPlanets.length > 0 && (
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Population</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredPlanets.map((planet) => (
+                            <tr key={planet.name}>
+                              <td>{planet.name}</td>
+                              <td>{planet.population}</td>
+                              <td>
+                                <button
+                                  onClick={() => handlePlanetSelect(planet.id)}
+                                >
+                                  Abrir Planeta
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </Typography>
+                </Box>
+              </ModalStyle>
+            </Modal>
           </div>
         </FormContainer>
       </Wrapper>

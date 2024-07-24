@@ -10,3 +10,5 @@ export const PLANET_IMAGES = {
   bespin: "https://cryptospro.com.br/planetas/planeta_0008_bespin.png",
   alderaan: "https://cryptospro.com.br/planetas/planeta_0009_alderaan.png",
 };
+
+export type PlanetsNames = keyof typeof PLANET_IMAGES;
