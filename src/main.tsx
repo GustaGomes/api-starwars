@@ -6,9 +6,6 @@ import PlanetDetail from "./pages/PlanetDetail";
 import Home from "./pages/Home";
 import ErrorPage from "./pages/Error";
 
-// TODO: usar o usePArams para pegar o id do planeta e mostrar tela
-// TODO: useNavigate eu vou usar para navegar entre componentes
-
 const router = createBrowserRouter([
   {
     element: <App />,

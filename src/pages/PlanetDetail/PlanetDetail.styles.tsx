@@ -26,6 +26,10 @@ export const ContentImage = styled.div`
   gap: 2rem;
   align-items: center;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: 1px;
+  }
 `;
 
 export const HeadDetail = styled.div`
@@ -57,6 +61,16 @@ export const DivImg = styled.div`
   align-items: center;
   gap: 1rem;
   font-size: 0.875rem /* 14px */;
+  input {
+    max-width: 136px;
+    border: none;
+    font-size: 18px;
+    font-weight: 900;
+  }
+  button {
+    background-color: transparent;
+    border: none;
+  }
   p {
     font-weight: 400;
   }
@@ -78,6 +92,10 @@ export const DivData = styled.div`
   }
   span {
     font-weight: 400;
+  }
+  @media (max-width: 768px) {
+    margin-left: 80px;
+    width: 100%;
   }
 `;
 

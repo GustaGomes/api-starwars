@@ -4,6 +4,11 @@
 - Instalar todas as dependencias usando "yarn" ou "npm install"
 - Rodar comando "yarn dev" ou "npm run dev"
 
+### - Fora do ambiente de teste. ( Como estudo e sem alterar de acordo com o prazo que foi dado )
+
+Estou subindo uma branch chamada de "alternative".
+Dentro dessa branch eu vou colocar algumas coisas como estudo e "melhorias" que não foram descritas no teste.
+
 ### Exemplos de planetas que você pode pesquisar :
 
 tatooine, naboo, mustafar, kashyyyk, hoth, endor, dagobah, coruscant, bespin, alderaan.

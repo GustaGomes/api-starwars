@@ -6,11 +6,7 @@ import { act } from "react";
 describe("<WrapperComponent />", () => {
   it("renders the title", () => {
     act(() => {
-      render(
-        <WrapperComponent>
-          <h1>WrapperComponent</h1>
-        </WrapperComponent>
-      );
+      render(<WrapperComponent />);
     });
 
     expect(screen.getByText("WrapperComponent")).toBeInTheDocument();

@@ -4,6 +4,7 @@ import React, {
   useState,
   ReactNode,
   useEffect,
+  useMemo,
 } from "react";
 import { Planet } from "../services/planets/model";
 import { getPlanets } from "../services/planets/getPlanets";
@@ -43,14 +44,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
       if (planet.name === selectedPlanet.name) {
         return { ...planet, name };
       }
-
       return planet;
     });
 
     setPlanets(newPlanets);
     setSelectedPlanet({ ...selectedPlanet, name });
+    alert("Planeta atualizado");
   };
 
+  // Buscar os dados dos planetas usando o getPlanets
   const fetchPlanets = async () => {
     try {
       const data = await getPlanets();
@@ -66,6 +68,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // Selecionar um planeta pelo nome e carregar suas informações
   const selectPlanet = async (name: string) => {
     setIsLoadingData(true);
 
@@ -74,7 +77,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
       (p) => p.name.toLowerCase() === name.toLowerCase()
     );
     const planet = currentPlanets[index];
-
+    // usar getFilm e getPeople para carregar as informações dos planetas para evitar mais chamadas na api
     try {
       if (!planet.fullFilms) {
         const films = planet.films.map(async (url) => {
@@ -105,6 +108,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     setIsLoadingData(false);
   };
 
+  // Memorizar o planeta selecionado
+  const memoizedPlanet = useMemo(() => {
+    if (!selectedPlanet) return;
+
+    return {
+      ...selectedPlanet,
+      fullFilms: selectedPlanet.fullFilms,
+      fullResidents: selectedPlanet.fullResidents,
+    };
+  }, [selectedPlanet]);
+
   useEffect(() => {
     fetchPlanets();
   }, []);
@@ -112,7 +126,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   return (
     <AppContext.Provider
       value={{
-        selectedPlanet,
+        selectedPlanet: memoizedPlanet,
         isLoadingData,
         getPlanetByName,
         editPlanet,
@@ -124,6 +138,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
+// Exportar o contexto
 export const useAppContext = (): AppContextType => {
   const context = useContext(AppContext);
   if (!context) {

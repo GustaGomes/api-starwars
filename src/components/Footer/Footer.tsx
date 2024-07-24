@@ -1,12 +1,7 @@
 import React from "react";
-
-import { FooterContent } from "./Footer.styles";
-import logoWeb from "../../assets/logo-web.png"; // Corrected file name
-import logoMob from "../../assets/logo-mob.png"; // Corrected file name
+import { FooterContent, Img } from "./Footer.styles";
 
 function FooterComponent() {
-  const isMobile = window.innerWidth <= 767;
-
   return (
     <FooterContent>
       <p>
@@ -14,11 +9,7 @@ function FooterComponent() {
         reservados
       </p>
       <span>|</span>
-      {isMobile ? (
-        <img src={logoMob} alt="Logo para celular" />
-      ) : (
-        <img src={logoWeb} alt="Logo para web" />
-      )}
+      <Img />
     </FooterContent>
   );
 }

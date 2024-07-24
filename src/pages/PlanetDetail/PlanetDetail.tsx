@@ -16,8 +16,9 @@ import {
   Terrain,
   Thermostat,
   MovieFilter,
+  Autorenew,
 } from "@mui/icons-material";
-import { Divider } from "@mui/material";
+import { Divider, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 type FormData = {
@@ -72,21 +73,25 @@ const PlanetDetail: React.FC = () => {
                     required: "Este campo é obrigatório",
                   })}
                 />
-                <button type="submit">Salvar</button>
+                <Tooltip title="Alterar nome do planeta">
+                  <button type="submit">
+                    <Autorenew fontSize="small" />
+                  </button>
+                </Tooltip>
                 {errors.name && <span>{errors.name.message}</span>}
               </div>
             </DivImg>
             <DivData>
               <div>
-                <Thermostat />
+                <Thermostat sx={{ marginRight: "5px" }} />
                 Climate: <span>{selectedPlanet.climate}</span>
               </div>
               <div>
-                <Terrain />
+                <Terrain sx={{ marginRight: "5px" }} />
                 Terrain: <span>{selectedPlanet.terrain}</span>
               </div>
               <div>
-                <Groups />
+                <Groups sx={{ marginRight: "5px" }} />
                 Population: <span>{selectedPlanet.population}</span>
               </div>
             </DivData>
