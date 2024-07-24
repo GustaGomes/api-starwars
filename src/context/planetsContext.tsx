@@ -108,6 +108,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     setIsLoadingData(false);
   };
 
+  // Memorizar o planeta selecionado
   const memoizedPlanet = useMemo(() => {
     if (!selectedPlanet) return;
 
