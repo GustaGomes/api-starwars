@@ -4,7 +4,6 @@ import {
   WrapperContent,
   Button,
   DivNav,
-  ResponsiveContainer,
   FilterSelectContainer,
   ResponsiveForm,
 } from "./Home.styles";

@@ -1,4 +1,3 @@
-import React from "react";
 import { WrapperContent } from "./Wrapper.styles";
 import HeaderComponent from "../Header/Header";
 import { Outlet } from "react-router-dom";

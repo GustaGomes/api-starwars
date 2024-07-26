@@ -6,6 +6,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [react()],
+  base: "/api-starwars",
   test: {
     globals: true,
     environment: "jsdom",

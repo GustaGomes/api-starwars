@@ -1,4 +1,3 @@
-import React from "react";
 import { HeaderContent, Img } from "./Header.styles";
 
 function HeaderComponent() {

@@ -1,4 +1,3 @@
-import React from "react";
 import { FooterContent, Img } from "./Footer.styles";
 
 function FooterComponent() {
