@@ -420,4 +420,4 @@ Error generating stack: `+i.message+`
     font-size: 2rem;
     margin-top: 20px;
   }
-`;function N5(){return T.jsx(L5,{children:T.jsx("h1",{children:"ErrorPage 404!"})})}const $5=LR([{element:T.jsx(YR,{}),errorElement:T.jsx(N5,{}),children:[{path:"/",element:T.jsx(D5,{})},{path:"/detail",element:T.jsx(E5,{})}]}]);Gf.createRoot(document.getElementById("root")).render(T.jsx(Ne.StrictMode,{children:T.jsx(BR,{router:$5})}));
+`;function N5(){return T.jsx(L5,{children:T.jsx("h1",{children:"ErrorPage 404!"})})}const $5=LR([{element:T.jsx(YR,{}),errorElement:T.jsx(N5,{}),children:[{path:"api-starwars/home",element:T.jsx(D5,{})},{path:"api-starwars/detail",element:T.jsx(E5,{})}]}]);Gf.createRoot(document.getElementById("root")).render(T.jsx(Ne.StrictMode,{children:T.jsx(BR,{router:$5})}));
